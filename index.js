@@ -110,7 +110,8 @@ return `${time}`
 
 
 app.get('/tmsg', async (req, res) => {
-   res.json({"msg_date":await tmsg(),"date_now":moment().tz('Asia/dhaka').format('h:m:s a,D/M/YY')})
+  let msgdate=await tmsg()
+   res.json({"msgdate":msgdate,"datenow":moment().tz('Asia/dhaka').format('h:m:s a,D/M/YY')})
 })
 
 
