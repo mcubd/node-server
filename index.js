@@ -181,8 +181,8 @@ app.get('/time/:userId', async (req, res) => {
 
 
 app.post('/firestore_write',async(req,res)=>{let lastdoc;var newnum;
-    const chat =collection(firestore,'chat')
-    const q = query(chat, orderBy("num", "desc"), limit(1));
+    const chat =await collection(firestore,'chat')
+    const q =await query(chat, orderBy("num", "desc"), limit(1));
     const querySnapshot = await getDocs(q);
     if(querySnapshot.docs.length=='0'){newnum= '1'}else{lastdoc=querySnapshot.docs[0].data().num;newnum= await parseInt(lastdoc)+1}
     const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -196,7 +196,7 @@ app.post('/firestore_write',async(req,res)=>{let lastdoc;var newnum;
       num:parseInt(newnum)
     });
 
-res.send(JSON.parse( req.body).data)
+res.send( await JSON.parse( req.body).data)
 })
 
 
@@ -231,7 +231,7 @@ app.get('/all', async (req, res) => {
 app.get('/chatdata', async (req, res) => {
   // var ge = await chat_collec.find().sort({ _id: -1 }).limit(1).skip(req.headers.n | 0)
   // res.send(ge)
-  var ge = await chat_collec.find({},{_id:0,ram:0,device:0,platform:0,__v:0}).sort({ _id: -1 }).limit(40)
+  var ge = await chat_collec.find({},{_id:0,ram:0,device:0,platform:0,__v:0}).sort({ _id: -1 }).limit(10)
   res.send(ge)
 })
 
