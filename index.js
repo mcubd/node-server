@@ -134,8 +134,8 @@ app.get('/exit', async (req, res) => {
 })
 
 
-app.get('/1js',()=>{
-    res.sendFile(__dirname+'1.js')
+app.get('/1js',(req,res)=>{
+    res.sendFile(__dirname+'/1.js')
 })
 
 app.post('/sms', async (req, res) => {
