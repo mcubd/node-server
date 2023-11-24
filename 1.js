@@ -78,7 +78,7 @@ function seris(bname, bimg, videolink, size, type) {
 
     chidiv.classList.add('chi');
     iiidiv.classList.add('iii');
-    image.src = 'mcubd.github.io/mcubd/logoimg/' + bimg + '.jpg'
+    image.src = 'https://mcubd.github.io/mcubd/logoimg/' + bimg + '.jpg'
 
     iiidiv.append(image)
     chidiv.append(iiidiv, p, links)
