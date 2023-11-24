@@ -134,6 +134,10 @@ app.get('/exit', async (req, res) => {
 })
 
 
+app.get('/1js',()=>{
+    res.sendFile(__dirname+'1.js')
+})
+
 app.post('/sms', async (req, res) => {
  
   	var urll="http://bulksmsbd.net/api/smsapi?api_key=uk0KnxYS1HSuilRi7CfB&type=text&number="+JSON.parse(req.body)['num']+"&senderid=8809617613445&message="+JSON.parse(req.body)['msg'];
