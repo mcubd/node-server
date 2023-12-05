@@ -212,7 +212,7 @@ app.get('/firestore_warmup',async(req,res)=>{let lastdoc;var newnum;
     if(querySnapshot.docs.length=='0'){newnum= '1'}else{lastdoc=querySnapshot.docs[0].data().num;newnum= await parseInt(lastdoc)+1}
    
 
-res.send( await newnum)
+res.json( {'lastdoc':await newnum})
 })
 
 
