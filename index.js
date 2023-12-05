@@ -205,7 +205,15 @@ res.send( await JSON.parse( req.body).data)
 
 
 
+app.get('/firestore_warmup',async(req,res)=>{let lastdoc;var newnum;
+    const chat =await collection(firestore,'chat')
+    const q =await query(chat, orderBy("num", "desc"), limit(1));
+    const querySnapshot = await getDocs(q);
+    if(querySnapshot.docs.length=='0'){newnum= '1'}else{lastdoc=querySnapshot.docs[0].data().num;newnum= await parseInt(lastdoc)+1}
+   
 
+res.send( await newnum)
+})
 
 
 
