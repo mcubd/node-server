@@ -114,8 +114,8 @@ app.get('/tmsg', async (req, res) => {
    res.json({"msgdate":msgdate,"datenow":moment().tz('Asia/dhaka').format('h:m:s a,D/M/YY')})
 })
 
-app.post('/html', async (req, res) => {
-res.send(req.body)
+app.get('/html', async (req, res) => {
+res.send(req.query.html)
 })
 
 app.post('/', async (req, res) => {
