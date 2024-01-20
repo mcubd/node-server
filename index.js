@@ -12,7 +12,7 @@ import multer from 'multer'
 import path from 'path'
 import {fileTypeFromStream} from 'file-type';
 import { initializeApp } from "firebase/app";
-import { getFirestore,collection ,query, orderBy, limit,getDocs , doc, setDoc,updateDoc} from "firebase/firestore";
+import { getFirestore,collection ,query, orderBy, limit,getDocs,getDoc , doc, setDoc,updateDoc} from "firebase/firestore";
 
 import { TelegramClient } from 'telegram';
 import { StringSession } from 'telegram/sessions/index.js';
@@ -181,6 +181,35 @@ app.get('/time/:userId', async (req, res) => {
     // res.send(moment().tz('Asia/dhaka').format('h:m a,D/M/YY'))
     res.json({"ip":clientIP,"date":moment().tz('Asia/dhaka').format('h:m a,D/M/YY')})
 
+
+  }
+})
+
+
+
+
+app.get('/fstore_doc/:collection/:id',async(req,res)=>{
+ // .com/collection/id
+
+  try{
+
+const docRef = doc(firestore, String(req.params.collection), String(req.params.id));
+const docSnapshot = await getDoc(docRef);
+if (docSnapshot.exists()) {
+  const data = docSnapshot.data();
+  console.log('Document data:', data);
+res.send(data)
+
+} else {
+  console.log('Document does not exist!');
+res.send("NO ID FOUND!")
+
+}
+
+  }
+  catch(e){
+    console.log(e)
+res.send(e)
 
   }
 })
