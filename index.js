@@ -12,7 +12,7 @@ import multer from 'multer'
 import path from 'path'
 import {fileTypeFromStream} from 'file-type';
 import { initializeApp } from "firebase/app";
-import { getFirestore,collection ,query, orderBy, limit,getDocs , doc, setDoc} from "firebase/firestore";
+import { getFirestore,collection ,query, orderBy, limit,getDocs , doc, setDoc,updateDoc} from "firebase/firestore";
 
 import { TelegramClient } from 'telegram';
 import { StringSession } from 'telegram/sessions/index.js';
@@ -218,7 +218,21 @@ res.json( {'lastdoc':await newnum})
 })
 
 
+app.post('/fstore_up_field',async(req,res)=>{
+  //{"collection":"test","id":"111","field":{"data":"jjj"}}
+  //this updates the given feild,all other feilds stay same,....also if given field if doesnt exist it creates the feild
+  try{
+  let json_obj=JSON.parse( req.body)  
+const docRef = doc(firestore, json_obj.collection, json_obj.id);
+await updateDoc(docRef,json_obj.field);
 
+res.send('all ok')
+  }
+  catch(e){
+res.send(e)
+
+  }
+})
 
 
 app.get('/up/:value', async (req,res)=>{
