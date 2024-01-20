@@ -218,7 +218,7 @@ res.json( {'lastdoc':await newnum})
 })
 
 
-app.post('/fstore_up_field',async(req,res)=>{
+app.post('/fstore_updoc',async(req,res)=>{
   //{"collection":"test","id":"111","field":{"data":"jjj"}}
   //this updates the given feild,all other feilds stay same,....also if given field if doesnt exist it creates the feild
   try{
