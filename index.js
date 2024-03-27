@@ -18,6 +18,8 @@ import { TelegramClient } from 'telegram';
 import { StringSession } from 'telegram/sessions/index.js';
 
 import got from 'got';
+import axios from 'axios';
+
 //const fbdl = require("fbdl-core");
 
 
@@ -107,6 +109,43 @@ return `${time}`
  
 
 }
+
+
+
+
+
+
+app.get('/uri/*', async (req, res) => {
+
+try {
+            const fullUrl = req.originalUrl;
+            const url =  fullUrl.replace('/uri/', '');
+            //'https://photos.app.goo.gl/AUU27xyNAhDzLzF68';  
+            const response = await axios.get(url);
+            const htmlContent = response.data;
+            const searchString = 'https://video-downloads';
+            const startIndex = htmlContent.indexOf(searchString);
+            if (startIndex !== -1) {
+                const endIndex = htmlContent.indexOf('"', startIndex);
+                if (endIndex !== -1) {
+                    const sentence = htmlContent.substring(startIndex, endIndex);
+                    console.log(sentence);
+                    res.send(sentence)
+                } else {
+                    res.send('error End of sentence not found.');
+                }
+            } else {
+                res.send('error Sentence not found.');
+            }
+        } catch (error) {
+            res.send('error');
+        }
+
+
+
+
+
+})
 
 
 app.get('/tmsg', async (req, res) => {
