@@ -115,11 +115,11 @@ return `${time}`
 
 
 
-app.get('/uri/*', async (req, res) => {
+app.post('/uri', async (req, res) => {
 
 try {
-            const fullUrl = req.originalUrl;
-            const url =  fullUrl.replace('/uri/', '');
+ 
+            const url = const url= req.body 
             //'https://photos.app.goo.gl/AUU27xyNAhDzLzF68';  
             const response = await axios.get(url);
             const htmlContent = response.data;
