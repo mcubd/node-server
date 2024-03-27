@@ -119,9 +119,10 @@ app.post('/uri', async (req, res) => {
 
 try {
  
-            const url = const url= req.body 
+                       const url=JSON.parse(req.body)
+ 
             //'https://photos.app.goo.gl/AUU27xyNAhDzLzF68';  
-            const response = await axios.get(url);
+            const response = await axios.get(url["a"]);
             const htmlContent = response.data;
             const searchString = 'https://video-downloads';
             const startIndex = htmlContent.indexOf(searchString);
