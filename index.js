@@ -1,22 +1,722 @@
-const express = require('express');
-const http = require('http');
+import mongoose from 'mongoose';
+import express from 'express';
+import cors from 'cors';
+import moment from 'moment-timezone';
+import { createServer } from "http";
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+import * as fs from 'fs';
+import bodyParser from 'body-parser'
+import fetch from 'node-fetch';
+import multer from 'multer'
+import path from 'path'
+import {fileTypeFromStream} from 'file-type';
+import { initializeApp } from "firebase/app";
+import { getFirestore,collection ,query, orderBy, limit,getDocs,getDoc , doc, setDoc,updateDoc} from "firebase/firestore";
 
+import { TelegramClient } from 'telegram';
+import { StringSession } from 'telegram/sessions/index.js';
+
+import got from 'got';
+import axios from 'axios';
+
+//const fbdl = require("fbdl-core");
+
+
+
+
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBzaFL1XOU-_152duOo0baL1DfgVVuSwMI",
+  authDomain: "test2-5bbd8.firebaseapp.com",
+  databaseURL: "https://test2-5bbd8-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "test2-5bbd8",
+  storageBucket: "test2-5bbd8.appspot.com",
+  messagingSenderId: "683307239625",
+  appId: "1:683307239625:web:d28ed1c2fb6b31dd4e6518"
+};
+
+// Initialize Firebase
+const appp = initializeApp(firebaseConfig);
+const firestore = getFirestore(appp);
+
+
+var DB = 'mongodb+srv://zayn:1221@cluster0.fzxdoyt.mongodb.net/db1?retryWrites=true&w=majority'; mongoose.connect(DB)
+  .then(() => { console.log('connected to the db') }).catch((err) => { console.log(err) })
+var schema = new mongoose.Schema({ name: String, ram: String, device: String, platform: String, date: String, ipad: String, num: String, browserr: String })
+var collec = new mongoose.model('za', schema)
+
+var chat_schema = new mongoose.Schema({ data: String, ram: String, device: String, platform: String, date: String, ip: String, num: String, media: String,fname:String,deleted:String })
+var chat_collec = new mongoose.model('chat_data', chat_schema)
+
+var multis_schema = new mongoose.Schema({ data: Array, ram: String, device: String, platform: String, date: String, ip: String, num: String, media: String,fname:String,name:String })
+var mlts_collec = new mongoose.model('multis', multis_schema)
+
+ 
+
+var __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
+const httpServer = createServer(app);
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH']
+}));
+app.set('trust proxy', true)
+// app.use(express.json())
 
-// Middleware to redirect HTTPS to HTTP
-app.use((req, res, next) => {
-  if (req.headers['x-forwarded-proto'] === 'https') {
-    res.redirect(`http://${req.hostname}${req.url}`);
-  } else {
-    next();
+// app.use(bodyParser.json({
+//   limit: '50mb'
+// }));
+app.use(bodyParser.text({ type: "*/*", limit: '50mb' }));
+
+httpServer.listen(process.env.PORT || 8000);
+
+
+
+const apiId = 28863345; 
+const apiHash = "0dae6aefb121ac09f5c2d07f09493452";
+const stringSession = new StringSession("1BQANOTEuMTA4LjU2LjEwNgG7ZgnLQyvRjqR7Mn0WhQFswQcpZPq7WEFwvN+wNRyt0AtBaSmcrgJOseJUMdscbVD3aC/kqyuzr9wpErEf6WnYQf/HuQ0pgUZf23x1s3rfB096hGSpFfx9m429I1YxmAJUydrlnHiTNCBlRsHAQDRiRNzS+X5ml/c2duEmn/dtcXJJk9Bt/GTXHnZZhr8ZANz9h7bwgqcaT9WtlII+JBXhj8uG2GEA5SxH7kVindm0uRzjaIIylGONFcuZDUUC7s5Yozk/Czm3pOR6JfpZaQAk3+/+Aw3wRloRBtRVIF6Mbian2Sf0NZg/727+Zc4aHknOcPNXlxjELcfuU16v12DmDg=="); // fill this later with the value from session.save()
+
+var tmsg=async () => {
+  console.log("Loading interactive example...");
+  const client = new TelegramClient(stringSession, apiId, apiHash, {
+    connectionRetries: 5,
+  });
+  await client.start({
+    phoneNumber: async () => await input.text("Please enter your number: "),
+    password: async () => await input.text("Please enter your password: "),
+    phoneCode: async () =>
+      await input.text("Please enter the code you received: "),
+    onError: (err) => console.log(err),
+  });
+  console.log("You should now be connected.");
+  console.log(client.session.save()); // Save this string to avoid logging in again
+//   await client.sendMessage("me", { message: "Hello!" }); 
+// console.log( (await client.getMessages('driveseed_tg_bot'))[0])
+let time=(await client.getMessages('@SHADHINA'))[0].date
+let timee=time*1000
+let dateObject=new Date(timee)
+const hours = dateObject.getHours();
+const minutes = dateObject.getMinutes();
+const seconds = dateObject.getSeconds();
+const ampm = hours >= 12 ? 'PM' : 'AM';
+const formattedHours = hours % 12 || 12;
+// console.log( (await client.getMessages('@SHADHINA'))[0].message)
+console.log( `${formattedHours}:${minutes}:${seconds}:${ampm}` )
+return `${time}`
+// console.log( (await client.getMessages('driveseed_tg_bot'))[2])
+ 
+
+}
+
+
+
+
+
+
+app.post('/uri', async (req, res) => {
+
+try {
+ 
+                       const url=JSON.parse(req.body)
+ 
+            //'https://photos.app.goo.gl/AUU27xyNAhDzLzF68';  
+            const response = await axios.get(url["a"]);
+            const htmlContent = response.data;
+            const searchString = 'https://video-downloads';
+            const startIndex = htmlContent.indexOf(searchString);
+            if (startIndex !== -1) {
+                const endIndex = htmlContent.indexOf('"', startIndex);
+                if (endIndex !== -1) {
+                    const sentence = htmlContent.substring(startIndex, endIndex);
+                    console.log(sentence);
+                    res.send(sentence)
+                } else {
+                    res.send('error End of sentence not found.');
+                }
+            } else {
+                res.send('error Sentence not found.');
+            }
+        } catch (error) {
+            res.send('error');
+        }
+
+
+
+
+
+})
+
+
+app.get('/tmsg', async (req, res) => {
+  let msgdate=await tmsg()
+   res.json({"msgdate":msgdate,"datenow":moment().tz('Asia/dhaka').format('h:m:s a,D/M/YY')})
+})
+
+app.get('/html', async (req, res) => {
+res.send(req.query.html)
+})
+
+app.post('/', async (req, res) => {
+
+  var d = await new collec({
+    name: req.headers.reqs,
+    date: moment().tz('Asia/dhaka').format('h:m a,D/M/YY'),
+    ipad: req.ip,
+    num: await collec.count() + 1,
+    browserr: req.headers.bro
+  }).save()
+
+  res.send('1')
+})
+app.get('/exit', async (req, res) => {
+  res.send('ge')
+  process.exit
+})
+
+
+app.get('/1js',(req,res)=>{
+    res.sendFile(__dirname+'/1.js')
+})
+
+app.post('/sms', async (req, res) => {
+ 
+  	var urll="http://bulksmsbd.net/api/smsapi?api_key=uk0KnxYS1HSuilRi7CfB&type=text&number="+JSON.parse(req.body)['num']+"&senderid=8809617613445&message="+JSON.parse(req.body)['msg'];
+     //var fdata= await fetch()
+    //var data = await fdata.text(); let status=await fdata.status; 
+ // res.send(`_____${ await status}_-_-_-_-_-_-_${await data}`)
+  res.send(req.body+JSON.parse(JSON.parse(req.body))["num"])
+  
+})
+
+
+  
+
+
+app.get('/', async (req, res) => {
+  var ge = await collec.find().sort({ _id: -1 }).limit(1).skip(req.headers.n || 0)
+
+  res.send(ge)
+})
+
+
+
+app.get('/time/:userId', async (req, res) => {
+  const userId = req.params.userId;
+  console.log()
+  const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+  res.set('Ip', clientIP);
+
+  if(userId=='sec'){
+    // res.send()
+    res.json({"ip":clientIP,"date":moment().tz('Asia/dhaka').format('h:m:s a,D/M/YY')})
+  }else if(userId=='msec'){
+    // res.send()
+    res.json({"ip":clientIP,"date":moment().tz('Asia/dhaka').format('h:m:ss:SSS a,D/M/YY')})
+
+
+  }else{
+    // res.send(moment().tz('Asia/dhaka').format('h:m a,D/M/YY'))
+    res.json({"ip":clientIP,"date":moment().tz('Asia/dhaka').format('h:m a,D/M/YY')})
+
+
   }
-});
+})
 
-// Your other routes and middleware
 
-// Start the HTTP server
-const server = http.createServer(app);
-const port = process.env.PORT || 3000;
-server.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+
+
+app.get('/fstore_doc/:collection/:id',async(req,res)=>{
+ // .com/collection/id
+
+  try{
+
+const docRef = doc(firestore, String(req.params.collection), String(req.params.id));
+const docSnapshot = await getDoc(docRef);
+if (docSnapshot.exists()) {
+  const data = docSnapshot.data();
+  console.log('Document data:', data);
+res.send(data)
+
+} else {
+  console.log('Document does not exist!');
+res.send("NO ID FOUND!")
+
+}
+
+  }
+  catch(e){
+    console.log(e)
+res.send(e)
+
+  }
+})
+
+
+app.post('/firestore_write',async(req,res)=>{let lastdoc;var newnum;
+    const chat =await collection(firestore,'chat')
+    const q =await query(chat, orderBy("num", "desc"), limit(1));
+    const querySnapshot = await getDocs(q);
+    if(querySnapshot.docs.length=='0'){newnum= '1'}else{lastdoc=querySnapshot.docs[0].data().num;newnum= await parseInt(lastdoc)+1}
+    const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    const z= await setDoc(doc(firestore, "chat",String(newnum)), { 
+      data: JSON.parse( req.body).data,
+      media:JSON.parse( req.body).media, 
+      fname:JSON.parse( req.body).fname,
+      // deleted:JSON.parse( req.body).data,
+      date:moment().tz('Asia/dhaka').format('h:m a,D/M/YY'),
+      ip:clientIP,
+      num:parseInt(newnum)
+    });
+
+res.send( await JSON.parse( req.body).data)
+})
+
+
+
+app.get('/firestore_warmup',async(req,res)=>{let lastdoc;var newnum;
+    const chat =await collection(firestore,'chat')
+    const q =await query(chat, orderBy("num", "desc"), limit(1));
+    const querySnapshot = await getDocs(q);
+    if(querySnapshot.docs.length=='0'){newnum= '1'}else{lastdoc=querySnapshot.docs[0].data().num;newnum= await parseInt(lastdoc)+1}
+   
+
+res.json( {'lastdoc':await newnum})
+})
+
+
+app.post('/fstore_updoc',async(req,res)=>{
+  //{"collection":"test","id":"111","field":{"data":"jjj"}}
+  //this updates the given feild,all other feilds stay same,....also if given field if doesnt exist it creates the feild
+  try{
+  let json_obj=JSON.parse( req.body)  
+const docRef = doc(firestore, json_obj.collection, json_obj.id);
+await updateDoc(docRef,json_obj.field);
+
+res.send('all ok')
+  }
+  catch(e){
+res.send(e)
+
+  }
+})
+
+
+app.get('/up/:value', async (req,res)=>{
+  var gee = await chat_collec.findOne({num:req.params.value}).select({data:1,_id:0,media:1,deleted:1})
+if(gee){if(gee['deleted']){
+  res.send('already deleted')
+  return false
+}}
+  
+const doc = await chat_collec.findOneAndUpdate({ num:req.params.value}, { data: '-', deleted:gee["data"],$unset: { media: 1,fname:1 }}, {
+  new: true
 });
+  res.send(gee)
+
+})
+
+
+app.get('/all', async (req, res) => {
+  var ge = await collec.find().sort({ _id: -1 })
+
+  res.send(ge)
+})
+
+app.get('/chatdata', async (req, res) => {
+  // var ge = await chat_collec.find().sort({ _id: -1 }).limit(1).skip(req.headers.n | 0)
+  // res.send(ge)
+  var ge = await chat_collec.find({},{_id:0,ram:0,device:0,platform:0,__v:0}).sort({ _id: -1 }).limit(10)
+  res.send(ge)
+})
+
+
+app.post('/chatdata', async (req, res) => {
+  var number = await chat_collec.count()
+  await new chat_collec({
+    data: JSON.parse(req.body).data,
+    date: moment().tz('Asia/dhaka').format('h:m a,D/M/YY'),
+    ip: req.ip,
+    num: number + 1,
+    ram: JSON.parse(req.body).ram,
+    device: JSON.parse(req.body).device,
+    platform: JSON.parse(req.body).platform,
+    media: JSON.parse(req.body).media,
+    fname:JSON.parse(req.body).fname,
+  }).save()
+
+  res.send(await chat_collec.find({ num: number + 1 }).sort({ _id: -1 }).limit(1))
+})
+
+
+app.post('/chatdatahis', async (req, res) => {
+  // var ge = await chat_collec.find({ num: req.body - 1 }).limit(1).skip(0)
+  var ge = await chat_collec.find({ num:{$in: [req.body-1,req.body-2,req.body-3,req.body-4,req.body-5,req.body-6,req.body-7,req.body-8,req.body-9,req.body-10,req.body-11,req.body-12,req.body-13,req.body-14,req.body-15,req.body-16,req.body-17,req.body-18,req.body-19,req.body-20,req.body-21,req.body-22,req.body-23,req.body-24,req.body-25,req.body-26,req.body-27,req.body-28,req.body-29,req.body-30,req.body-31,req.body-32,req.body-33,req.body-34,req.body-35,req.body-36,req.body-37,req.body-38,req.body-39,req.body-40]} },{_id:0,ram:0,device:0,platform:0,__v:0}).sort({_id:-1})
+  res.send(ge)
+})
+
+
+app.post('/chatdatanew', async (req, res) => {
+  var ge = await chat_collec.find({ num: parseInt(req.body) + 1 }).sort({ _id: -1 }).limit(1)
+  res.send(ge)
+})
+
+
+app.get('/chatdatanoti', async (req, res) => {
+  var ge = await chat_collec.find().sort({ _id: -1 }).limit(1)
+
+  var text = ge[0].device.toLowerCase();
+  var text2 = ge[0].platform.toLowerCase();
+  let result = text.match(/oppo f1s/i);
+  let result2 = text2.match(/win32/i);
+
+
+  if (result2) { res.send('nothing new') } else {
+
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+        'Authorization': 'key=AAAAh3rwJYY:APA91bG6BNcz-ommMEQEl7NdfGU3HtdoqBfBnPyPsNvb45q2rxuhFPnPAddXStJ4QuoKY2G0ygT_rzngv809hSkpT11rkCyHy_npJoHxzTca-GJZqpfltFQydL3U3St0KbfbfrcrjRH6'
+      },
+      body: JSON.stringify({
+        "to": "c_i0MyCGNSi3XDSZX9KPR7:APA91bEwhy-FzPpCWELWbCqHvxW2cRdpJHZ41RNrA9Riv-zzQRVPu_P0Mc30_oKun8Z-cHlSmyQ8PHKJDEjV4gVNisq2nM7pwDqKCupqhcwP6AkxmoXB0zQERQ9pCGpdDkW9mrH0WjIv",
+        "notification": {
+          "title": "New Message",
+          "body": ge[0].data,
+          "image": "https://mcubd.netlify.app/logoimg/noti.png",
+          "mutable_content": true,
+          "sound": "Tri-tone"
+        },
+
+        //  "data": {
+        //   "id" : 1,
+        //   "text" : "new Symulti update !",
+        //   "link" : "href://www.symulti.com"
+        //     }
+      }
+      )
+    };
+
+    fetch('https://fcm.googleapis.com/fcm/send', options)
+      .then(response => {
+        res.send('response' + response.toString())
+      }).catch(e => { res.send('eror' + e) })
+
+
+  }
+
+
+
+
+
+
+
+})
+
+
+
+
+
+app.get('/pj', async (req, res) => {
+
+  res.sendFile(__dirname + '/sevice-worker.html')
+})
+
+
+
+app.post('/pj', (req, res) => {
+
+  console.log(req.body)
+
+
+
+
+  res.send('ok')
+})
+
+
+
+
+
+
+
+app.get('/z.js', async (req, res) => {
+  res.sendFile(__dirname + '/z.js')
+})
+
+
+
+app.get('/his', async (req, res) => {
+  var ge = await collec.find().limit(1).skip(req.headers.n || 0)
+
+  res.send(ge)
+})
+
+app.get('/d0000000000', async (req, res) => {
+  var ge = await collec.deleteMany()
+
+  res.send(ge)
+})
+
+app.get('/chathis/d0000000000', async (req, res) => {
+  var ge = await chat_collec.deleteMany()
+
+  res.send(ge)
+})
+
+
+
+app.get('/loki', async (req, res) => {
+  res.send('1')
+
+  var dd = await new collec({
+    name: 'loki express',
+    date: moment().tz('Asia/dhaka').format('h:m a,D/M/YY'),
+    ipad: req.ip,
+    num: await collec.count() + 1
+  }).save()
+})
+
+
+app.post('/ndata', async (req, res) => {
+  var d = await new collec({
+    name: req.body,
+    date: moment().tz('Asia/dhaka').format('h:m a,D/M/YY'),
+    ipad: req.ip,
+    num: await collec.count() + 1,
+    browserr: req.headers.bro
+  }).save()
+  console.log(JSON.parse(req.body).a)
+  res.send(req.body)
+
+})
+
+
+
+app.post('/ram', async (req, res) => {
+  var d = await new collec({
+    name: JSON.parse(req.body).name,
+    ram: JSON.parse(req.body).ramxhw,
+    device: JSON.parse(req.body).device,
+    platform: JSON.parse(req.body).platform,
+    date: moment().tz('Asia/dhaka').format('h:m a,D/M/YY'),
+    ipad: req.ip,
+    num: await collec.count() + 1,
+  }).save()
+
+  res.send({ ...JSON.parse(req.body), num: await collec.count() })
+
+})
+
+app.get('/not', async (req, res) => {
+
+  let doc1 = await mlts_collec.findOne({name:"down_mv_count"})
+  let doc1d=doc1.data 
+
+    let doc = await mlts_collec.findOne({name:"push_token"})
+    let push_tokenar=doc.data
+
+
+    if(doc1d.length != 1){
+      let arr=[]
+      push_tokenar.forEach(i => {
+
+        const options = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+            'Authorization': 'key=AAAAh3rwJYY:APA91bG6BNcz-ommMEQEl7NdfGU3HtdoqBfBnPyPsNvb45q2rxuhFPnPAddXStJ4QuoKY2G0ygT_rzngv809hSkpT11rkCyHy_npJoHxzTca-GJZqpfltFQydL3U3St0KbfbfrcrjRH6'
+          },
+          body: JSON.stringify({
+            "to": i,
+            "notification": {
+              "title": "g drive movie 404",
+              // "body": 'g drive movie 404',
+              // "image": "https://mcubd.netlify.app/logoimg/noti.png",
+              "mutable_content": true,
+              "sound": "Tri-tone"
+            },
+          }
+          )
+        };
+
+
+        arr.push(fetch('https://fcm.googleapis.com/fcm/send', options).then((res) => { return { status: res.status} }))
+
+
+      });
+      let resu=  await Promise.all(arr)
+      res.send(resu)
+
+
+    }else{
+      res.send('not not send cuz 0 link down')
+
+    }
+    
+    
+
+})
+
+app.get('/z',async (req,res) => {
+  let b= await mlts_collec.updateMany({name:'test'}, { $set: {device:JSON.stringify(req.headers),date:moment().tz('Asia/dhaka').format('h:m a,D/M/YY') } });
+  res.send('jj')
+ 
+})
+
+app.post('/chatnot', async (req, res) => {
+
+    let doc = await mlts_collec.findOne({name:"push_token"})
+      let arr=[]
+      doc.data.forEach(i => {
+
+
+        const options = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+            'Authorization': 'key=AAAAh3rwJYY:APA91bG6BNcz-ommMEQEl7NdfGU3HtdoqBfBnPyPsNvb45q2rxuhFPnPAddXStJ4QuoKY2G0ygT_rzngv809hSkpT11rkCyHy_npJoHxzTca-GJZqpfltFQydL3U3St0KbfbfrcrjRH6'
+          },
+          body: JSON.stringify({
+            "to": i,
+            "notification": {
+              "title":  req.body || 'mcubd chat',
+              // "body": 'g drive movie 404',
+              // "image": "https://mcubd.netlify.app/logoimg/noti.png",
+              "mutable_content": true,
+              "sound": "Tri-tone"
+            },
+          }
+          )
+        };
+
+
+        arr.push(fetch('https://fcm.googleapis.com/fcm/send', options).then((res) => { return res.status }))
+
+
+      });
+      let resu=  await Promise.all(arr)
+      res.send([...new Set([...resu])])
+
+    
+
+})
+
+app.post('/push_token', async (req, res) => {
+  let doc = await mlts_collec.findOne({name:"push_token"})
+  let fullar=[...new Set([...doc.data,req.body])]  
+  console.log(fullar)
+  var b= await mlts_collec.updateMany({name:'push_token'}, { $set: { data:fullar ,date:moment().tz('Asia/dhaka').format('h:m a,D/M/YY') } });
+  res.send(b)
+})
+
+
+app.get('/cheak_down_links', async (req, res) => {
+
+  let resp= await mlts_collec.findOne({name:'mcubd_links'})
+  let str=JSON.stringify(resp)
+  let json=JSON.parse(str)
+  let links=json.links
+  if(links[1] != '['){console.log('link is not array!'); return 'l' }
+  let arr=JSON.parse(links)
+  arr=[...arr[0],...arr[1],...arr[2]]
+
+
+  let ar2 = []
+
+  arr.forEach(i => {
+
+    if(JSON.parse(i).length==1){
+      ar2.push(JSON.parse(i)[0])
+    }else{
+          JSON.parse(i).forEach(item => {
+            ar2.push(item)});
+    }
+    
+  });
+ 
+  let promisear=[]
+
+  ar2.forEach(item => {
+    promisear.push(fetch(item).then((res) => { return { status: res.status, url: item } }))
+  });
+
+  let resu=  await Promise.all(promisear)
+  let ar3=['zero']
+  resu.forEach(ele => {
+    if(ele.status !='200'){ ar3.push(ele.url) }
+  });
+
+  console.log(ar3)
+ 
+  
+
+  let b= await mlts_collec.updateMany({name:'down_mv_count'}, { $set: { data: ar3 ,date:moment().tz('Asia/dhaka').format('h:m a,D/M/YY') } });
+
+  // let b= await mlts_collec.updateMany({name:'down_mv_count'}, { $set: { data:['h','g'] ,date:moment().tz('Asia/dhaka').format('h:m a,D/M/YY') } });
+
+  res.send(ar3 +'--- '+ JSON.stringify(b))
+})
+
+app.get('/timeout',(req,res) => {
+  setTimeout(() => {
+    res.send('eeee')
+  }, 100000);
+ 
+})
+ 
+
+
+
+app.get('/fileup', async (req, res) => {res.sendFile(__dirname+'/z.html')})
+const storage=multer.diskStorage({
+  destination:(req,file,cb) => {
+    var fold=path.join(__dirname,'..','..','..','Downloads')
+    cb(null ,fold)
+  },
+  filename:(req,file,cb) => {
+    const fext=path.extname(file.originalname);
+    const fname=file.originalname
+                .replace(fext,"")
+                .toLowerCase()
+                .split(" ")
+                .join("-")+"-"+ Date.now();
+                console.log(file.originalname)
+    cb(null, fname+fext)
+   
+  }
+})
+const upload=multer({
+storage:storage,
+  limits:{fieldSize:100000000000000000000000},
+}) 
+app.post('/up',upload.single('NAME'),(req,res) => { res.send('kk') })
+ 
+
+app.post('/filetype',async (req,res) => {
+try{
+  
+  const response = await fetch(req.body);
+  // console.log(response.body)
+  const fileType = await fileTypeFromStream(response.body);
+  console.log(fileType);res.send(fileType);
+}catch(e){ console.log('eror'+e);res.send(e) }  
+}) 
+
+app.get('/goo',async (req,res)=>{
+  const html = await got.get('https://drive.google.com/uc?export=download&id=1PEkrNN4T2ZoqwDrpMU9Oeq8Go8AytqLw').text();
+const regex = /(?<=action="\b)(.*?)(?=")/g;
+const result = html.match(regex);
+
+  var gg=`
+<!DOCTYPE html><html><head><title>Google Drive - Virus scan warning</title><meta http-equiv="content-type" content="text/html; charset=utf-8"/><style nonce="NmU3E7wp7fzSe5LyoxMV5A">.goog-inline-block{position:relative;display:-moz-inline-box;display:inline-block}* html .goog-inline-block{display:inline}*:first-child+html .goog-inline-block{display:inline}.goog-link-button{position:relative;color:#15c;text-decoration:underline;cursor:pointer}.goog-link-button-disabled{color:#ccc;text-decoration:none;cursor:default}body{color:#222;font:normal 13px/1.4 arial,sans-serif;margin:0}.grecaptcha-badge{visibility:hidden}.uc-main{padding-top:50px;text-align:center}#uc-dl-icon{display:inline-block;margin-top:16px;padding-right:1em;vertical-align:top}#uc-text{display:inline-block;max-width:68ex;text-align:left}.uc-error-caption,.uc-warning-caption{color:#222;font-size:16px}#uc-download-link{text-decoration:none}.uc-name-size a{color:#15c;text-decoration:none}.uc-name-size a:visited{color:#61c;text-decoration:none}.uc-name-size a:active{color:#d14836;text-decoration:none}.uc-footer{color:#777;font-size:11px;padding-bottom:5ex;padding-top:5ex;text-align:center}.uc-footer a{color:#15c}.uc-footer a:visited{color:#61c}.uc-footer a:active{color:#d14836}.uc-footer-divider{color:#ccc;width:100%}sentinel{}</style><link rel="icon" href="//ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png"/></head><body><div class="uc-main"><div id="uc-dl-icon" class="image-container"><div class="drive-sprite-aux-download-file"></div></div><div id="uc-text"><p class="uc-warning-caption">Google Drive can't scan this file for viruses.</p><p class="uc-warning-subcaption"><span class="uc-name-size"><a href="/open?id=1bwQZC4QeycK-vZhEJsp1tQkNt_oLkAIE&amp;authuser=4">ACS Varsity   GST Admission Private Batch 2023 __ ⭕️Matrices .mp4</a> (1.3G)</span> is too large for Google to scan for viruses. Would you still like to download this file?</p><form id="download-form" action="https://drive.google.com/u/4/uc?id=1bwQZC4QeycK-vZhEJsp1tQkNt_oLkAIE&amp;export=download&amp;confirm=t&amp;uuid=579d185c-48f1-4419-b609-19000b56ef53&amp;at=AB6BwCCxVKvKl2fcYZa6y6BL3BFH:1697012967231" method="post"><input type="submit" id="uc-download-link" class="goog-inline-block jfk-button jfk-button-action" value="Download anyway"/></form></div></div><div class="uc-footer"><hr class="uc-footer-divider"></div></body></html>`
+ var ggg =`
+<!DOCTYPE html><html><head><title>Google Drive - Virus scan warning</title><meta http-equiv="content-type" content="text/html; charset=utf-8"/><style nonce="NP3V7SZg0oB6vfkAxDEecQ">.goog-inline-block{position:relative;display:-moz-inline-box;display:inline-block}* html .goog-inline-block{display:inline}*:first-child+html .goog-inline-block{display:inline}.goog-link-button{position:relative;color:#15c;text-decoration:underline;cursor:pointer}.goog-link-button-disabled{color:#ccc;text-decoration:none;cursor:default}body{color:#222;font:normal 13px/1.4 arial,sans-serif;margin:0}.grecaptcha-badge{visibility:hidden}.uc-main{padding-top:50px;text-align:center}#uc-dl-icon{display:inline-block;margin-top:16px;padding-right:1em;vertical-align:top}#uc-text{display:inline-block;max-width:68ex;text-align:left}.uc-error-caption,.uc-warning-caption{color:#222;font-size:16px}#uc-download-link{text-decoration:none}.uc-name-size a{color:#15c;text-decoration:none}.uc-name-size a:visited{color:#61c;text-decoration:none}.uc-name-size a:active{color:#d14836;text-decoration:none}.uc-footer{color:#777;font-size:11px;padding-bottom:5ex;padding-top:5ex;text-align:center}.uc-footer a{color:#15c}.uc-footer a:visited{color:#61c}.uc-footer a:active{color:#d14836}.uc-footer-divider{color:#ccc;width:100%}sentinel{}</style><link rel="icon" href="//ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png"/></head><body><div class="uc-main"><div id="uc-dl-icon" class="image-container"><div class="drive-sprite-aux-download-file"></div></div><div id="uc-text"><p class="uc-warning-caption">Google Drive can't scan this file for viruses.</p><p class="uc-warning-subcaption"><span class="uc-name-size"><a href="/open?id=1PEkrNN4T2ZoqwDrpMU9Oeq8Go8AytqLw&amp;authuser=0">Matrix-lecture1.mp4</a> (514M)</span> is too large for Google to scan for viruses. Would you still like to download this file?</p><form id="download-form" action="https://drive.google.com/uc?id=1PEkrNN4T2ZoqwDrpMU9Oeq8Go8AytqLw&amp;export=download&amp;confirm=t&amp;uuid=101dbe7d-82de-481f-bfaa-5818d78f7371&amp;at=AB6BwCAgjyngdnNlVCwiqXjM9DfR:1697014097734" method="post"><input type="submit" id="uc-download-link" class="goog-inline-block jfk-button jfk-button-action" value="Download anyway"/></form></div></div><div class="uc-footer"><hr class="uc-footer-divider"></div></body></html>`
+ // res.send(ggg)
+  fbdl.getInfo("https://www.facebook.com/100057668881010/posts/pfbid021wcxbes9ENuXkyZqhS6LxhXy3rr6bVK8S3DUuYNwgDxUzjkV4sqihx58L8hgdNtbl/?app=fbl")
+    .then(res.send);
+  
+})
