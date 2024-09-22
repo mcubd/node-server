@@ -332,6 +332,13 @@ app.get('/chatdata', async (req, res) => {
   res.send(ge)
 })
 
+app.get('/chatall', async (req, res) => {
+  // var ge = await chat_collec.find().sort({ _id: -1 }).limit(1).skip(req.headers.n | 0)
+  // res.send(ge)
+  var ge = await chat_collec.find({},{_id:0,ram:0,device:0,platform:0,__v:0}).sort({ _id: -1 })
+  res.send(ge)
+})
+
 
 app.post('/chatdata', async (req, res) => {
   var number = await chat_collec.count()
